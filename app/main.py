@@ -1,7 +1,7 @@
 from typing import List
 from pydantic import BaseModel
 from fastapi import FastAPI
-# from translation_example import translate
+from translation_example import translate
 
 app = FastAPI()
 
@@ -26,14 +26,15 @@ class TranslationResult(BaseModel):
     
 @app.post("/translation", response_model=TranslationResult)
 def translation(payload: Payload):
-    # print(payload)
-    # payload = payload.payload
-    # print(payload)
-    # records = payload.records
-    # for record in records:
-    #     print(record.text)
-        
-        # record.text = translate(record.text, payload.fromLang, payload.toLang)
-    translated_record = TranslatedRecord(id="123", text="人生はチョコレートの箱のようなものだ。")
-    return TranslationResult(result=[translated_record])
-    # return {"result": "人生はチョコレートの箱のようなものだ。"}
+    translated_records = []
+    payload = payload.payload
+    records = payload.records
+    for record in records:
+        id = record.id
+        text = record.text
+    
+        translated_text = translate(text, payload.fromLang, payload.toLang)
+        translated_record = TranslatedRecord(id="123", text=translated_text)
+        translated_records.append(translated_record)
+    
+    return TranslationResult(result=translated_records)
